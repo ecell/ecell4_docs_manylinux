@@ -1,0 +1,23 @@
+dist: xenial
+language: python
+install:
+  - sudo apt-get update
+  - sudo apt-get install python3-pip python3-setuptools git wget pandoc unzip ffmpeg -y
+  - sudo python3 -m pip install -U pip setuptools
+  - sudo python3 -m pip --version
+  - sudo python3 -m pip install ecell4_base
+  - sudo python3 -m pip install git+https://github.com/ecell/ecell4
+  - sudo python3 -m pip install nbconvert matplotlib jupyter-client ipykernel
+
+script:
+  - wget https://github.com/ecell/ecell4_docs/archive/master.zip
+  - unzip master.zip
+  - jupyter nbconvert --to=html --ExecutePreprocessor.enabled=True --ExecutePreprocessor.timeout=3600 ./ecell4_docs-master/en/tutorials/*.ipynb
+  - mkdir ./surge
+  - mv ./ecell4_docs-master/en/tutorials/*.html ./surge
+
+deploy:
+  provider: surge
+  project: ./surge
+  domain: ecell4manylinux.surge.sh
+  skip_cleanup: true
